@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import mongoose, { Schema } from "mongoose";
 import {
   GenderRoleEnum,
@@ -24,6 +25,17 @@ const UserSchema: Schema = new Schema<UserI>({
   address: { type: String, required: true },
   aadharNumber: { type: String, required: true, unique: true },
   isVoted: { type: Boolean, default: false },
+  password: { type: String, required: true },
 });
+
+UserSchema.methods.comparePassword = async function (
+  upcomingPassword: string
+): Promise<boolean> {
+  try {
+    return await bcrypt.compare(upcomingPassword, this.password);
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const User = mongoose.model<UserI>("User", UserSchema);

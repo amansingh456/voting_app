@@ -6,7 +6,7 @@ const APIResponse = {
     data,
     errors: [],
   }),
-  error: (message: string, errors: object | [object] = []) => ({
+  error: (message: string, errors: object | any | [object] = []) => ({
     success: false,
     error: true,
     message,

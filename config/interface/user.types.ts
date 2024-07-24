@@ -19,4 +19,11 @@ export interface UserI extends Document {
   address: string;
   aadharNumber: string;
   isVoted: boolean;
+  password: String;
+  comparePassword(upcomingPassword: string): Promise<boolean>;
+}
+
+export interface payloadForToken {
+  id: string;
+  username: string | undefined;
 }
