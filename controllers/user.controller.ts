@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import * as yup from "yup";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 import { handleValidationError } from "../utils/yupValidError";
 import {
   userLoginBody,
@@ -10,8 +8,11 @@ import {
 import { printLog } from "../utils/loggers";
 import APIResponse from "../utils/APIResponse";
 import { User } from "../model/user.model";
-import { payloadForToken } from "../config/interface/user.types";
-import { jwtSecret } from "../utils/globalVars";
+
+import {
+  generateJwtToken,
+  genrateHashPassword,
+} from "../middleware/jwt.token.middleware";
 
 export const userSignup = async (req: Request, res: Response) => {
   try {
@@ -23,7 +24,7 @@ export const userSignup = async (req: Request, res: Response) => {
 
     const payload = {
       id: response?.id,
-      username: response?.name,
+      name: response?.name,
     };
 
     const jwtToken = generateJwtToken(payload);
@@ -35,7 +36,7 @@ export const userSignup = async (req: Request, res: Response) => {
   } catch (error: any) {
     printLog("something went wrong, while siging in user", error, false, null);
     if (error instanceof yup.ValidationError) {
-      return handleValidationError(res, error, 500);
+      return handleValidationError(res, error, 400);
     } else {
       res
         .status(500)
@@ -65,7 +66,7 @@ export const userLogin = async (req: Request, res: Response) => {
 
     const payload = {
       id: getUser.id,
-      username: getUser.name,
+      name: getUser.name,
     };
 
     const jwtToken = generateJwtToken(payload);
@@ -80,7 +81,7 @@ export const userLogin = async (req: Request, res: Response) => {
   } catch (error: any) {
     printLog("something went wrong, while siging in user", error, false, null);
     if (error instanceof yup.ValidationError) {
-      handleValidationError(res, error, 500);
+      handleValidationError(res, error, 400);
     } else {
       res
         .status(500)
@@ -92,17 +93,6 @@ export const userLogin = async (req: Request, res: Response) => {
         );
     }
   }
-};
-
-const generateJwtToken = (payload: payloadForToken): string => {
-  const token = jwt.sign(payload, jwtSecret, { expiresIn: "24h" });
-  return token;
-};
-const genrateHashPassword = async (pass: string): Promise<string> => {
-  const saltRounds = 10;
-  const salt = await bcrypt.genSaltSync(saltRounds);
-  const hash = await bcrypt.hash(pass, salt);
-  return hash;
 };
 
 export default { userSignup };

@@ -13,7 +13,7 @@ const CandidateSchema: Schema = new Schema<CandidateI>({
   age: { type: Number, required: true },
   party: { type: String, required: true },
   votes: [VotesSchema],
-  voteCount: { type: Number },
+  voteCount: { type: Number, default: 0 },
 });
 
 export const Candidate = mongoose.model<CandidateI>(

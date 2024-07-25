@@ -25,5 +25,7 @@ export interface UserI extends Document {
 
 export interface payloadForToken {
   id: string;
-  username: string | undefined;
+  name: string;
+  iat?: number;
+  exp?: number;
 }
