@@ -13,4 +13,5 @@ export interface CandidateI extends Document {
   party: string;
   votes: VoteI[];
   voteCount: Number;
+  electedByWhom: string;
 }

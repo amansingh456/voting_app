@@ -4,13 +4,13 @@ import { mongoUrl } from "../../utils/globalVars";
 
 const connectionMongo = async (): Promise<void | string> => {
   if (!mongoUrl) {
-    printLog("not able to found mongo url", null, false, null);
+    printLog("not able to found mongo url", null, false, { mongoUrl });
   }
   try {
     await mongoose.connect(mongoUrl);
     printLog("successfully connected to mongoDB...!", null, true, null);
   } catch (error: any) {
-    printLog("failed to connect DB", error, false, null);
+    printLog("failed to connect DB", error, false, { mongoUrl });
     throw error;
   }
 };

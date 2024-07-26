@@ -7,6 +7,7 @@ const VotesSchema: Schema = new Schema<VoteI>({
 });
 
 const CandidateSchema: Schema = new Schema<CandidateI>({
+  electedByWhom: { type: String },
   email: { type: String },
   mobileNumber: { type: String, required: true, unique: true },
   name: { type: String, required: true },

@@ -5,43 +5,30 @@ import { printLog } from "../utils/loggers";
 import APIResponse from "../utils/APIResponse";
 import { handleValidationError } from "../utils/yupValidError";
 import { candidateValidation } from "../config/validation/candidate.validation";
-import { User } from "../model/user.model";
-
-const checkAdminRole = async (userId: string) => {
-  try {
-    const user = await User.findById(userId);
-    return user?.role === "admin";
-  } catch (error) {
-    return false;
-  }
-};
 
 export const candidateSave = async (req: any, res: Response) => {
   try {
-    if (!(await checkAdminRole(req?.user?.id))) {
-      return res
-        .status(403)
-        .json(APIResponse.error("user has not admin role", null));
-    }
     const data = await candidateValidation.validate(req.body, {
       abortEarly: false,
     });
-    const newCandidate = new Candidate(data);
+    const electedByWhom = req.user.id;
+
+    const newCandidate = new Candidate({
+      ...data,
+      electedByWhom,
+    });
     const response = await newCandidate.save();
 
     printLog("user saved succesfully", false, true, {
-      userName: response.name,
+      mobileNumber: response.mobileNumber,
     });
     return res
       .status(200)
       .json(APIResponse.success({}, "candidate saved in DB"));
   } catch (error: any) {
-    printLog(
-      "something went wrong, while saving candidate",
-      error,
-      false,
-      null
-    );
+    printLog("something went wrong, while saving candidate", error, false, {
+      mobileNumber: req?.body?.mobileNUmber,
+    });
     if (error instanceof yup.ValidationError) {
       return handleValidationError(res, error, 400);
     } else {
@@ -59,11 +46,6 @@ export const candidateSave = async (req: any, res: Response) => {
 
 export const candidateUpdate = async (req: any, res: Response) => {
   try {
-    if (!checkAdminRole(req?.user?.id)) {
-      return res
-        .status(403)
-        .json(APIResponse.error("user has not admin role", null));
-    }
     const candidateID = req?.params?.candidateID;
     const updatedCandidateData = req?.body;
 
@@ -111,11 +93,6 @@ export const candidateUpdate = async (req: any, res: Response) => {
 
 export const deleteCandidate = async (req: any, res: Response) => {
   try {
-    if (!checkAdminRole(req?.user?.id)) {
-      return res
-        .status(403)
-        .json(APIResponse.error("user has not admin role", null));
-    }
     const candidateID = req.params.candidateID;
 
     const response = await Candidate.findByIdAndDelete(candidateID);

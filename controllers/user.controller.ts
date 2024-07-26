@@ -22,19 +22,14 @@ export const userSignup = async (req: Request, res: Response) => {
     const newUser = new User(data);
     const response = await newUser.save();
 
-    const payload = {
-      id: response?.id,
-      name: response?.name,
-    };
-
-    const jwtToken = generateJwtToken(payload);
-
     printLog("user saved succesfully", false, true, {
-      userName: response.name,
+      mobileNumber: req?.body?.mobileNumber,
     });
-    res.status(200).json(APIResponse.success({ jwtToken }, "User saved in DB"));
+    res.status(200).json(APIResponse.success({}, "User saved in DB"));
   } catch (error: any) {
-    printLog("something went wrong, while siging in user", error, false, null);
+    printLog("something went wrong, while siging in user", error, false, {
+      mobileNumber: req?.body?.mobileNumber,
+    });
     if (error instanceof yup.ValidationError) {
       return handleValidationError(res, error, 400);
     } else {
@@ -79,7 +74,9 @@ export const userLogin = async (req: Request, res: Response) => {
       .status(200)
       .json(APIResponse.success({ jwtToken }, "User logged in"));
   } catch (error: any) {
-    printLog("something went wrong, while siging in user", error, false, null);
+    printLog("something went wrong, while siging in user", error, false, {
+      aadharNumber: req?.body?.aadharNumber,
+    });
     if (error instanceof yup.ValidationError) {
       handleValidationError(res, error, 400);
     } else {

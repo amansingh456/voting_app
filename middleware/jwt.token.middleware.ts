@@ -27,7 +27,9 @@ export const authJwtMiddleware = (
     req.user = decoded;
     next();
   } catch (err) {
-    printLog("something went wrong while decoding token", err, false, null);
+    printLog("something went wrong while decoding token", err, false, {
+      extractedToken: extractToken,
+    });
     return res.status(401).json({ error: "Invalid token" });
   }
 };
